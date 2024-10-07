@@ -38,7 +38,7 @@ n_actions = env.action_space.n  # type: ignore
 #     learning_rate=0.5, epsilon=0.25, gamma=0.99, legal_actions=list(range(n_actions))
 # )
 agent = QLearningAgent(
-    learning_rate=0.1, epsilon=0.1, gamma=0.6, legal_actions=list(range(n_actions))
+    learning_rate=0.5, epsilon=0.1, gamma=0.99, legal_actions=list(range(n_actions))
 )
 
 def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float:
@@ -50,7 +50,6 @@ def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float
     """
     total_reward: t.SupportsFloat = 0.0
     s, _ = env.reset()
-    count = 0
     for _ in range(t_max):
         # Get agent to pick action given state s
         a = agent.get_action(s)
@@ -59,46 +58,56 @@ def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float
 
         # Train agent for state s
         # BEGIN SOLUTION
-        count +=1
         agent.update(s, a, r, next_s)
         total_reward +=r
-        if done or count == 200:
-            s, _ = env.reset()
-            count = 0
-        else:
-            s = next_s
+        s = next_s
+        if done :
+            break
         # END SOLUTION
 
     return total_reward
 
 
+
 rewards = []
 for i in range(1000):
-    rewards.append(play_and_train(env, agent))
+    rewards.append(play_and_train(env, agent, 200))
     if i % 100 == 0:
         print("mean reward", np.mean(rewards[-100:]))
 
 assert np.mean(rewards[-100:]) > 0.0
 # TODO: créer des vidéos de l'agent en action
-
+# add video recording
+tmp_env = gym.wrappers.RecordVideo(env, "videos/qlearning", name_prefix="qlearning")
+tmp_env.start_video_recorder()
+play_and_train(tmp_env, agent, 200)
+# stop video recording and save it
+tmp_env.close_video_recorder()
+tmp_env.close()
 #################################################
 # 2. Play with QLearningAgentEpsScheduling
 #################################################
 
 
 agent = QLearningAgentEpsScheduling(
-    learning_rate=0.1, epsilon=0.1, gamma=0.6, legal_actions=list(range(n_actions))
+    learning_rate=0.5, epsilon=0.1, gamma=0.99, legal_actions=list(range(n_actions))
 )
-
 rewards = []
 for i in range(1000):
-    rewards.append(play_and_train(env, agent))
+    rewards.append(play_and_train(env, agent, 200))
     if i % 100 == 0:
         print("mean reward", np.mean(rewards[-100:]))
 
 assert np.mean(rewards[-100:]) > 0.0
 # TODO: créer des vidéos de l'agent en action
-
+# add video recording
+tmp_env = gym.wrappers.RecordVideo(env, "videos/qlearning_eps_scheduling", name_prefix="qlearning_eps_scheduling")
+tmp_env.start_video_recorder()
+play_and_train(tmp_env, agent, 200)
+# stop video recording and save it
+tmp_env.close_video_recorder()
+tmp_env.close()
+########################
 
 ####################
 # 3. Play with SARSA
@@ -107,8 +116,17 @@ assert np.mean(rewards[-100:]) > 0.0
 
 agent = SarsaAgent(learning_rate=0.5, gamma=0.99, legal_actions=list(range(n_actions)))
 
+
 rewards = []
 for i in range(1000):
-    rewards.append(play_and_train(env, agent))
+    rewards.append(play_and_train(env, agent, 200))
     if i % 100 == 0:
         print("mean reward", np.mean(rewards[-100:]))
+assert np.mean(rewards[-100:]) > 0.0
+# add video recording
+tmp_env = gym.wrappers.RecordVideo(env, "videos/sarsa", name_prefix="sarsa")
+tmp_env.start_video_recorder()
+play_and_train(tmp_env, agent, 200)
+# stop video recording and save it
+tmp_env.close_video_recorder()
+tmp_env.close()

@@ -43,16 +43,14 @@ class QLearningAgentEpsScheduling(QLearningAgent):
         action = self.legal_actions[0]
 
         # BEGIN SOLUTION
-        if self.timestep == 0:
-            self.reset()
-        
+            
         if np.random.random() <= self.epsilon:
             action = random.choice(self.legal_actions)
         else:
             action = self.get_best_action(state)
-    
-        self.epsilon -= (self.epsilon_start - self.epsilon_end) / self.epsilon_decay_steps
-        self.timestep = (self.timestep + 1) % self.epsilon_decay_steps
+        self.timestep = (self.timestep + 1)
+        self.epsilon = self.epsilon_start - (self.epsilon_start - self.epsilon_end) / self.epsilon_decay_steps * self.timestep
+        self.epsilon = max(self.epsilon, self.epsilon_end) 
         # END SOLUTION
 
         return action
