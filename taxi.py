@@ -23,7 +23,7 @@ import gymnasium as gym
 import numpy as np
 from qlearning import QLearningAgent
 from qlearning_eps_scheduling import QLearningAgentEpsScheduling
-from sarsa import SARSAAgent
+from sarsa import SarsaAgent
 
 
 env = gym.make("Taxi-v3", render_mode="rgb_array")
@@ -34,10 +34,12 @@ n_actions = env.action_space.n  # type: ignore
 # 1. Play with QLearningAgent
 #################################################
 
+# agent = QLearningAgent(
+#     learning_rate=0.5, epsilon=0.25, gamma=0.99, legal_actions=list(range(n_actions))
+# )
 agent = QLearningAgent(
-    learning_rate=0.5, epsilon=0.25, gamma=0.99, legal_actions=list(range(n_actions))
+    learning_rate=0.1, epsilon=0.1, gamma=0.6, legal_actions=list(range(n_actions))
 )
-
 
 def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float:
     """
@@ -48,7 +50,7 @@ def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float
     """
     total_reward: t.SupportsFloat = 0.0
     s, _ = env.reset()
-
+    count = 0
     for _ in range(t_max):
         # Get agent to pick action given state s
         a = agent.get_action(s)
@@ -57,6 +59,14 @@ def play_and_train(env: gym.Env, agent: QLearningAgent, t_max=int(1e4)) -> float
 
         # Train agent for state s
         # BEGIN SOLUTION
+        count +=1
+        agent.update(s, a, r, next_s)
+        total_reward +=r
+        if done or count == 200:
+            s, _ = env.reset()
+            count = 0
+        else:
+            s = next_s
         # END SOLUTION
 
     return total_reward
@@ -96,7 +106,7 @@ assert np.mean(rewards[-100:]) > 0.0
 ####################
 
 
-agent = SARSAAgent(learning_rate=0.5, gamma=0.99, legal_actions=list(range(n_actions)))
+agent = SarsaAgent(learning_rate=0.5, gamma=0.99, legal_actions=list(range(n_actions)))
 
 rewards = []
 for i in range(1000):
