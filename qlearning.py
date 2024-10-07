@@ -95,7 +95,7 @@ class QLearningAgent:
         action = self.legal_actions[0]
 
         # BEGIN SOLUTION
-        if np.random.random() < self.epsilon:
+        if np.random.random() <= self.epsilon:
             action = random.choice(self.legal_actions)
         else:
             action = self.get_best_action(state)

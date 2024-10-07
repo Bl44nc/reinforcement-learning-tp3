@@ -87,7 +87,7 @@ assert np.mean(rewards[-100:]) > 0.0
 
 
 agent = QLearningAgentEpsScheduling(
-    learning_rate=0.5, epsilon=0.25, gamma=0.99, legal_actions=list(range(n_actions))
+    learning_rate=0.1, epsilon=0.1, gamma=0.6, legal_actions=list(range(n_actions))
 )
 
 rewards = []
@@ -97,7 +97,6 @@ for i in range(1000):
         print("mean reward", np.mean(rewards[-100:]))
 
 assert np.mean(rewards[-100:]) > 0.0
-
 # TODO: créer des vidéos de l'agent en action
 
 
